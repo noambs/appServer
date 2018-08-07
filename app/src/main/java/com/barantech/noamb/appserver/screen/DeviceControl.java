@@ -17,6 +17,7 @@ public class DeviceControl extends AppCompatActivity {
     private ImageView redLed;
     private ImageView blueLed;
     private ImageView greenLed;
+    private CommunicationThread device;
     public static DeviceControl activity;
     public static TextView numberOfPress;
     @Override
@@ -26,7 +27,7 @@ public class DeviceControl extends AppCompatActivity {
         Intent intent = getIntent();
 
         String deviceMacAddress = (String) intent.getStringExtra(CommunicationThread.FIELD_MAC);
-        CommunicationThread device = DeviceConnected.deviceList.get(deviceMacAddress);
+        device = DeviceConnected.deviceList.get(deviceMacAddress);
 
         lock = (ImageView) findViewById(R.id.lock);
         device.setLockStatus(false);
@@ -41,11 +42,13 @@ public class DeviceControl extends AppCompatActivity {
                 int tag = (int) lock.getTag();
                 if(tag == R.drawable.close_lock)
                 {
+                    device.sendData("*OPEN#");
                     lock.setImageResource(R.drawable.open_lock);
                     lock.setTag(R.drawable.open_lock);
                 }
                 else
                 {
+                    device.sendData("*CLOSE#");
                     lock.setImageResource(R.drawable.close_lock);
                     lock.setTag(R.drawable.close_lock);
                 }
@@ -61,6 +64,7 @@ public class DeviceControl extends AppCompatActivity {
 
         if(ledsStatus == 0)
         {
+            device.sendData("*"+0+"#");
             redLed.setImageResource(R.mipmap.red_led_off);
             redLed.setTag(R.mipmap.red_led_off);
             greenLed.setImageResource(R.mipmap.green_led_off);
@@ -70,6 +74,7 @@ public class DeviceControl extends AppCompatActivity {
         }else{
             if(ledsStatus == 1)
             {
+                device.sendData("*"+0+";"+(char)2+"#");
                 redLed.setImageResource(R.mipmap.red_led_on);
                 redLed.setTag(R.mipmap.red_led_on);
                 greenLed.setImageResource(R.mipmap.green_led_off);
@@ -79,6 +84,7 @@ public class DeviceControl extends AppCompatActivity {
             }else{
                 if(ledsStatus == 2)
                 {
+                    device.sendData("*"+0+";"+(char)4+"#");
                     redLed.setImageResource(R.mipmap.red_led_off);
                     redLed.setTag(R.mipmap.red_led_off);
                     greenLed.setImageResource(R.mipmap.green_led_on);
@@ -86,6 +92,7 @@ public class DeviceControl extends AppCompatActivity {
                     blueLed.setImageResource(R.mipmap.blue_led_off);
                     blueLed.setTag(R.mipmap.blue_led_off);
                 }else{
+                    device.sendData("*"+0+";"+(char)8+"#");
                     redLed.setImageResource(R.mipmap.red_led_off);
                     redLed.setTag(R.mipmap.red_led_off);
                     greenLed.setImageResource(R.mipmap.green_led_off);
@@ -102,6 +109,7 @@ public class DeviceControl extends AppCompatActivity {
                 int tag = (int) redLed.getTag();
                 if(tag == R.mipmap.red_led_off)
                 {
+                    device.sendData("*"+0+";"+(char)2+"#");
                     redLed.setImageResource(R.mipmap.red_led_on);
                     redLed.setTag(R.mipmap.red_led_on);
                     greenLed.setImageResource(R.mipmap.green_led_off);
@@ -111,6 +119,7 @@ public class DeviceControl extends AppCompatActivity {
                 }
                 else
                 {
+                    device.sendData("*"+0+"#");
                     redLed.setImageResource(R.mipmap.red_led_off);
                     redLed.setTag(R.mipmap.red_led_off);
                 }
@@ -124,6 +133,7 @@ public class DeviceControl extends AppCompatActivity {
                 int tag = (int) greenLed.getTag();
                 if(tag == R.mipmap.green_led_off)
                 {
+                    device.sendData("*"+0+";"+(char)4+"#");
                     redLed.setImageResource(R.mipmap.red_led_off);
                     redLed.setTag(R.mipmap.red_led_off);
                     greenLed.setImageResource(R.mipmap.green_led_on);
@@ -133,6 +143,7 @@ public class DeviceControl extends AppCompatActivity {
                 }
                 else
                 {
+                    device.sendData("*"+0+"#");
                     greenLed.setImageResource(R.mipmap.green_led_off);
                     greenLed.setTag(R.mipmap.green_led_off);
                 }
@@ -145,6 +156,7 @@ public class DeviceControl extends AppCompatActivity {
                 int tag = (int) blueLed.getTag();
                 if(tag == R.mipmap.blue_led_off)
                 {
+                    device.sendData("*"+0+";"+(char)8+"#");
                     redLed.setImageResource(R.mipmap.red_led_off);
                     redLed.setTag(R.mipmap.red_led_off);
                     greenLed.setImageResource(R.mipmap.green_led_off);
@@ -154,6 +166,7 @@ public class DeviceControl extends AppCompatActivity {
                 }
                 else
                 {
+                    device.sendData("*"+0+"#");
                     blueLed.setImageResource(R.mipmap.blue_led_off);
                     blueLed.setTag(R.mipmap.blue_led_off);
                 }
@@ -161,23 +174,34 @@ public class DeviceControl extends AppCompatActivity {
         });
 
 
-
+        numberOfPress = (TextView) findViewById(R.id.press_counter);
 
         Button resetButton = (Button) findViewById(R.id.reset_button);
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                device.sendData("*OPEN#");
+                lock.setImageResource(R.drawable.open_lock);
+                lock.setTag(R.drawable.open_lock);
 
+                device.sendData("*"+0+"#");
+                redLed.setImageResource(R.mipmap.red_led_off);
+                redLed.setTag(R.mipmap.red_led_off);
+                greenLed.setImageResource(R.mipmap.green_led_off);
+                greenLed.setTag(R.mipmap.green_led_off);
+                blueLed.setImageResource(R.mipmap.blue_led_off);
+                blueLed.setTag(R.mipmap.blue_led_off);
+                updateNumberOfPress(0);
             }
         });
 
-        numberOfPress = (TextView) findViewById(R.id.press_counter);
+
 
         activity = this;
     }
 
     public static void updateNumberOfPress(int num)
     {
-        numberOfPress.setText(num);
+        numberOfPress.setText(String.valueOf(num));
     }
 }

@@ -34,6 +34,7 @@ public class CommunicationThread implements Runnable{
         this.clientSocket = socket;
         this.activityDeviceConnected = activity;
         this.activityDeviceControl = DeviceControl.activity;
+        numberOfPress = 0;
         if(clientSocket!=null)
         {
 
@@ -104,16 +105,35 @@ public class CommunicationThread implements Runnable{
 
 
             //Identifies if a swith press occurred
-            if(read.equals("P"))
+            if(read!=null)
             {
-                numberOfPress++;
-                activityDeviceControl.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        DeviceControl.updateNumberOfPress(numberOfPress);
-                    }
-                });
+                if(read.equals("*P#"))
+                {
+                    numberOfPress++;
+                    activityDeviceControl.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            DeviceControl.updateNumberOfPress(numberOfPress);
+                        }
+                    });
+                }
             }
+
+        }
+
+    }
+
+    /**
+     * send data to the device/client
+     * @param data
+     */
+    public void sendData(String data)
+    {
+        try {
+            outputStream.write(data);
+            outputStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }
