@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".screen.DeviceControl">
+
+    <ImageView
+        android:id="@+id/lock"
+        android:layout_width="122dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="353dp"
+        android:layout_marginTop="68dp"
+        app:layout_constraintBottom_toTopOf="@+id/reset_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/open_lock" />
+
+    <ImageView
+        android:id="@+id/red_led"
+        android:layout_width="118dp"
+        android:layout_height="108dp"
+        android:layout_marginBottom="105dp"
+        android:layout_marginEnd="135dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="247dp"
+        app:layout_constraintBottom_toTopOf="@+id/textView5"
+        app:layout_constraintEnd_toStartOf="@+id/blue_led"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/red_led_off" />
+
+    <ImageView
+        android:id="@+id/green_led"
+        android:layout_width="118dp"
+        android:layout_height="108dp"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.498"
+        app:srcCompat="@mipmap/green_led_off" />
+
+    <ImageView
+        android:id="@+id/blue_led"
+        android:layout_width="118dp"
+        android:layout_height="108dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/red_led"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.498"
+        app:srcCompat="@mipmap/blue_led_off" />
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="158dp"
+        android:layout_height="36dp"
+        android:layout_marginBottom="106dp"
+        android:layout_marginEnd="11dp"
+        android:layout_marginStart="84dp"
+        android:text="Press Counter :"
+        android:textAlignment="center"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/green_led"
+        app:layout_constraintEnd_toStartOf="@+id/press_counter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/red_led" />
+
+    <TextView
+        android:id="@+id/press_counter"
+        android:layout_width="57dp"
+        android:layout_height="38dp"
+        android:layout_marginBottom="106dp"
+        android:layout_marginEnd="134dp"
+        android:layout_marginTop="104dp"
+        android:text="0"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView5"
+        app:layout_constraintTop_toBottomOf="@+id/green_led" />
+
+    <Button
+        android:id="@+id/reset_button"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="31dp"
+        android:text="Reset"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lock" />
+
+</android.support.constraint.ConstraintLayout>

@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.barantech.noamb.appserver.screen.ClientControlScreen"
-    tools:showIn="@layout/activity_client_control_screen">
+    tools:context="com.barantech.noamb.appserver.screen.DeviceConnected"
+    tools:showIn="@layout/activity_devices_connected">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -25,7 +25,7 @@
             />
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/places_list"
+            android:id="@+id/device_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
