@@ -47,6 +47,8 @@
 
         </activity>
 
+        <service android:name=".services.ClosingService"
+                 android:stopWithTask="false"/>
     </application>
 
 </manifest>

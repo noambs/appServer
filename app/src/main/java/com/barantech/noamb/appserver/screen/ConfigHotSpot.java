@@ -26,7 +26,8 @@ public class ConfigHotSpot extends AppCompatActivity {
 
         ssid = findViewById(R.id.SSID);
         password = findViewById(R.id.password);
-
+        ssid.setText("RBS1");
+        password.setText("12345678");
         if(hotSpot == null)
             hotSpot = new HotSpot(ConfigHotSpot.this);
         mButton = findViewById(R.id.button1);
