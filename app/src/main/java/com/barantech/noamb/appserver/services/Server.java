@@ -7,20 +7,20 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server {
+public class Server extends Thread{
 
     //port number
     public static final int PORT = 11111;
 
     //Server Socket declaration
-    private static ServerSocket serverSocket ;
+    public static ServerSocket serverSocket ;
     private DeviceConnected activity;
 
     public Server(DeviceConnected activity)
     {
         this.activity = activity;
-        Thread socketServerThread = new Thread(new SocketServerThread());
-        new Thread(socketServerThread).start();
+        //SocketServerThread socketServerThread = new SocketServerThread();
+        //socketServerThread.start();
     }
 
     public static void onDestroy()
@@ -35,33 +35,31 @@ public class Server {
         }
     }
 
-    private class SocketServerThread implements Runnable
+    public void run()
     {
-
-        public void run()
-        {
-            try{
-                //create ServerSocket using specified port
-                serverSocket = new ServerSocket(PORT);
-                while(!Thread.currentThread().isInterrupted())
+        try{
+            //create ServerSocket using specified port
+            serverSocket = new ServerSocket(PORT);
+            serverSocket.setReuseAddress(true);
+            //while(!Thread.currentThread().isInterrupted())
+            while(true)
+            {
+                if(!serverSocket.isClosed() && serverSocket!=null)
                 {
                     Socket socket = serverSocket.accept();
-
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                        }
-                    });
-
-                    CommunicationThread commThread = new CommunicationThread(socket, activity);
-                    new Thread(commThread).start();
+                    if(socket!=null)
+                    {
+                        CommunicationThread commThread = new CommunicationThread(socket, activity);
+                        commThread.start();
+                    }
                 }
-            }
-            catch (IOException exp)
-            {
+
 
             }
+        }
+        catch (IOException exp)
+        {
+            exp.printStackTrace();
         }
     }
 

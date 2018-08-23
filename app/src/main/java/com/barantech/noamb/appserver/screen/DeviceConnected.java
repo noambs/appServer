@@ -24,6 +24,7 @@ import com.barantech.noamb.appserver.services.CommunicationThread;
 import com.barantech.noamb.appserver.services.HotSpot;
 import com.barantech.noamb.appserver.services.Server;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
@@ -38,6 +39,7 @@ public class DeviceConnected extends AppCompatActivity {
     private String passWord;
     private HotSpot mHotSpot;
     private Server server;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,7 +65,7 @@ public class DeviceConnected extends AppCompatActivity {
 
         deviceList = new LinkedHashMap<String, CommunicationThread>();
         server = new Server(this);
-
+        server.start();
         context = DeviceConnected.this;
         loadDevice();
 
@@ -95,6 +97,7 @@ public class DeviceConnected extends AppCompatActivity {
 
                     @Override
                     public void onDeviceClicked(CommunicationThread device) {
+
                         Intent deviceIntent = new Intent(context, DeviceControl.class);
                         deviceIntent.putExtra(CommunicationThread.FIELD_MAC, device.getMacAddress());
                         context.startActivity(deviceIntent);
@@ -197,12 +200,29 @@ public class DeviceConnected extends AppCompatActivity {
 
         }
 
+        public static void removeDevice(CommunicationThread device)
+        {
+            deviceList.remove(device.getMacAddress());
 
 
-    protected void onDestroy()
-    {
-        super.onDestroy();
-        server.onDestroy();
-        HotSpot.onDestroy();
-    }
+        }
+
+
+    @Override
+   protected void onDestroy()
+   {
+       super.onDestroy();
+       HotSpot.onDestroy();
+       Server.onDestroy();
+       Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+       intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+       intent.putExtra("EXIT", true);
+       startActivity(intent);
+   }
+
+   protected void onResume()
+   {
+       super.onResume();
+       loadDevice();
+   }
 }
