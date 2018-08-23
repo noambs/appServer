@@ -2,6 +2,9 @@ package com.barantech.noamb.appserver.screen;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -15,9 +18,12 @@ public class MainActivity extends AppCompatActivity {
     private Button nextButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        if (getIntent().getBooleanExtra("EXIT", false)) {
+            finish();
+        }
 
 
         nextButton = findViewById(R.id.next);

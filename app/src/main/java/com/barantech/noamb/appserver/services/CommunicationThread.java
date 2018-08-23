@@ -2,25 +2,27 @@ package com.barantech.noamb.appserver.services;
 
 
 
+import android.widget.Toast;
+
 import com.barantech.noamb.appserver.screen.DeviceConnected;
 import com.barantech.noamb.appserver.screen.DeviceControl;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.concurrent.ExecutionException;
 
-public class CommunicationThread implements Runnable{
+
+public class CommunicationThread extends Thread{
 
     public static final String FIELD_MAC= "mac";
 
 
     private Socket clientSocket;
-    private BufferedWriter outputStream;
+    private PrintWriter outputStream;
     private BufferedReader inputBuffer;
     private String macAddress;
     private String ipAddress;
@@ -30,58 +32,33 @@ public class CommunicationThread implements Runnable{
     private DeviceControl activityDeviceControl;
     private boolean lockStatus;
     private int ledColor;
+    private String read;
+    private boolean isConnected;
     public CommunicationThread(Socket socket, DeviceConnected activity) {
         this.clientSocket = socket;
         this.activityDeviceConnected = activity;
-        this.activityDeviceControl = DeviceControl.activity;
+
         numberOfPress = 0;
+        boolean isReachable = false;
+
         if(clientSocket!=null)
         {
 
-            /* get the information of the connected device*/
             try {
-                BufferedReader br = new BufferedReader(new FileReader("/proc/net/arp"));
-                String line;
-                boolean isFirstLine = true;
-                while ((line = br.readLine()) != null) {
-                    if (isFirstLine) {
-                        isFirstLine = false;
-                        continue;
-                    }
+                this.inputBuffer = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
+                //this.outputStream = new BufferedWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()));
+                this.outputStream  = new PrintWriter(new BufferedWriter(
+                new OutputStreamWriter(clientSocket.getOutputStream())),
 
-                    String[] splitted = line.split(" +");
-                    if (splitted != null && splitted.length >= 4)
-                    {
-                        ipAddress = splitted[0];
-                        macAddress = splitted[3];
-                        info = splitted[5];
-                    }
-                }
+                true);
 
-
-
-                try {
-                    this.inputBuffer = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
-                    this.outputStream = new BufferedWriter(new OutputStreamWriter(this.clientSocket.getOutputStream()));
-                } catch (IOException exp) {
-                    exp.printStackTrace();
-                }
-
-                numberOfPress = 0;
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException exp) {
+                exp.printStackTrace();
             }
-
-            DeviceConnected.addDevice(this);
-
-            activityDeviceConnected.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    DeviceConnected.loadDevice();
-                }
-            });
+            macAddress = "";
+            ipAddress = clientSocket.getInetAddress().toString().substring(1);
+            setLedColor(0);
+            lockStatus = false;
 
 
 
@@ -92,34 +69,80 @@ public class CommunicationThread implements Runnable{
     @Override
     public void run()
     {
-
-        while(!Thread.currentThread().isInterrupted())
+        while(true)
         {
-            String read = "";
 
+
+            read = "";
+            if(macAddress.equals(""))
+            {
+                sendData("*mac#");
+
+            }
             try {
-                read = inputBuffer.readLine();
+                if(inputBuffer.ready())
+                {
+
+                    read = inputBuffer.readLine();
+                    if(read!=null)
+                    {
+                        if(read.contains("*P#") && !lockStatus)
+                        {
+                            numberOfPress++;
+                            if(activityDeviceControl!=null)
+                            {
+                                activityDeviceControl.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        DeviceControl.updateNumberOfPress(numberOfPress,macAddress);
+                                    }
+                                });
+                            }
+
+                        }
+
+                        if(read.contains("mac"))
+                        {
+                            macAddress = read.substring(3);
+                            sendData("*ok#");
+                            DeviceConnected.addDevice(this);
+                            isConnected = true;
+                            activityDeviceConnected.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+
+
+                                    DeviceConnected.loadDevice();
+                                }
+                            });
+                        }
+                    }
+                }else{
+                     try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                }
+
+
+                /*activityDeviceConnected.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(activityDeviceConnected, read, Toast.LENGTH_SHORT).show();
+                    }
+                });*/
+
             } catch (IOException e) {
                 e.printStackTrace();
+
             }
 
 
-            //Identifies if a swith press occurred
-            if(read!=null)
-            {
-                if(read.equals("*P#"))
-                {
-                    numberOfPress++;
-                    activityDeviceControl.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            DeviceControl.updateNumberOfPress(numberOfPress);
-                        }
-                    });
-                }
-            }
+
+
 
         }
+
 
     }
 
@@ -129,12 +152,7 @@ public class CommunicationThread implements Runnable{
      */
     public void sendData(String data)
     {
-        try {
-            outputStream.write(data);
-            outputStream.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        outputStream.println(data);
 
     }
 
@@ -155,7 +173,7 @@ public class CommunicationThread implements Runnable{
         return info;
     }
 
-    public BufferedWriter getOutputStream() {
+    public PrintWriter getOutputStream() {
         return outputStream;
     }
 
@@ -168,7 +186,9 @@ public class CommunicationThread implements Runnable{
         return clientSocket;
     }
 
-
+    public boolean isConnected() {
+        return isConnected;
+    }
 
     /**
      *
@@ -197,4 +217,28 @@ public class CommunicationThread implements Runnable{
     {
         ledColor = color;
     }
+
+    public void setNumberOfPress(int num)
+    {
+        numberOfPress = num;
+    }
+    public void setActivityDeviceControl(DeviceControl activityDeviceControl) {
+        this.activityDeviceControl = activityDeviceControl;
+    }
+
+    class updateUIThread implements Runnable {
+        private String msg;
+
+        public updateUIThread(String str) {
+            this.msg = str;
+        }
+
+        @Override
+         public void run() {
+            Toast toast = Toast.makeText(activityDeviceConnected, this.msg, Toast.LENGTH_LONG);
+            toast.show();
+
+        }
+    }
+
 }
