@@ -21,10 +21,8 @@ import android.widget.TextView;
 
 import com.barantech.noamb.appserver.R;
 import com.barantech.noamb.appserver.services.CommunicationThread;
-import com.barantech.noamb.appserver.services.HotSpot;
 import com.barantech.noamb.appserver.services.Server;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
@@ -35,9 +33,8 @@ public class DeviceConnected extends AppCompatActivity {
     private static Context context;
     private static RecyclerView mRecyclerView;
     private static ProgressBar mProgressBar;
-    private String SSID;
-    private String passWord;
-    private HotSpot mHotSpot;
+
+
     private Server server;
 
     @Override
@@ -48,8 +45,6 @@ public class DeviceConnected extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-        SSID = getIntent().getExtras().getString("SSID");
-        passWord = getIntent().getExtras().getString("password");
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
@@ -212,12 +207,15 @@ public class DeviceConnected extends AppCompatActivity {
    protected void onDestroy()
    {
        super.onDestroy();
-       HotSpot.onDestroy();
+      // Intent hotspot = new Intent(getApplicationContext(),HotSpotIntentService.class);
+      // hotspot.setAction(getString(R.string.intent_action_ondestroy));
+      // this.startActivity(hotspot);
        Server.onDestroy();
+       //finish();
        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
        intent.putExtra("EXIT", true);
-       startActivity(intent);
+       this.startActivity(intent);
    }
 
    protected void onResume()
