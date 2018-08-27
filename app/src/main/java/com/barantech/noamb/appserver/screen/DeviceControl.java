@@ -1,22 +1,17 @@
 package com.barantech.noamb.appserver.screen;
 
 
-import android.app.Dialog;
-import android.content.DialogInterface;
+
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import com.barantech.noamb.appserver.R;
 import com.barantech.noamb.appserver.services.AsyncDialog;
@@ -24,8 +19,6 @@ import com.barantech.noamb.appserver.services.CommunicationThread;
 import com.barantech.noamb.appserver.services.Connection;
 import com.barantech.noamb.appserver.services.SendData;
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 
 public class DeviceControl extends AppCompatActivity {
@@ -386,7 +379,7 @@ public class DeviceControl extends AppCompatActivity {
                     new SendData(device).execute("*OPEN#");
                     lock.setImageResource(R.drawable.open_lock);
                     lock.setTag(R.drawable.open_lock);
-
+                    device.setLockStatus(false);
                     //device.sendData("*"+0+"#");
                     new SendData(device).execute("*"+0+"#");
                     redLed.setImageResource(R.mipmap.red_led_off);
@@ -397,6 +390,7 @@ public class DeviceControl extends AppCompatActivity {
                     blueLed.setTag(R.mipmap.blue_led_off);
                     updateNumberOfPress(0, device.getMacAddress());
                     device.setNumberOfPress(0);
+                    device.setLedColor(0);
                 } else{
                     disconnectHandler();
                 }
@@ -427,22 +421,7 @@ public class DeviceControl extends AppCompatActivity {
     private void disconnectHandler()
     {
         final AsyncDialog builder = new AsyncDialog(this);
-        final Timer timer;// Declare it above
 
-
-        timer = new Timer();//Initialized
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-
-
-                // cancel the progress dialogue after 5 seconds
-                //builder.cancel(true);
-                timer.cancel();
-              // finish();
-
-            }
-        }, 5000 ,5000);
         builder.execute();
         DeviceConnected.removeDevice(device);
         try {

@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import com.barantech.noamb.appserver.screen.DeviceConnected;
-import com.barantech.noamb.appserver.screen.DeviceControl;
 
 public class ClosingService extends Service {
     @Nullable
@@ -18,7 +16,7 @@ public class ClosingService extends Service {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        HotSpot.onDestroy();
+        //HotSpot.onDestroy();
         Server.onDestroy();
 
         // Destroy the service

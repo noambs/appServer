@@ -1,96 +1,98 @@
 package com.barantech.noamb.appserver.screen;
 
-import android.annotation.TargetApi;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.barantech.noamb.appserver.R;
-import com.barantech.noamb.appserver.services.HotSpot;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 
-public class ConfigHotSpot extends AppCompatActivity {
+public class ConfigHotSpot extends PermissionsActivity {
 
-    private EditText ssid;
-    private EditText password;
-    private Button mButton;
-    public static HotSpot hotSpot;
+
+    public static ConfigHotSpot context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_config_hot_spot);
 
-
-        ssid = findViewById(R.id.SSID);
-        password = findViewById(R.id.password);
-        ssid.setText("RBS1");
-        password.setText("12345678");
-        if(hotSpot == null)
-            hotSpot = new HotSpot(ConfigHotSpot.this);
-        mButton = findViewById(R.id.button1);
-       /* if(HotSpot.wifiManager!=null)
+        if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.O)
         {
-            hotSpot.onDestroy();
-        }*/
-        mButton.setOnClickListener(new View.OnClickListener() {
-            @TargetApi(Build.VERSION_CODES.O)
-            @RequiresApi(api = Build.VERSION_CODES.O)
-            @Override
-            public void onClick(View view) {
-
-                String string_ssid = ssid.getText().toString();
-                String string_password = password.getText().toString();
-                if(string_ssid.equals(""))
-                {
-                    Toast.makeText(getApplicationContext(),"Enter SSID Name!!!", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
-                    if(hotSpot.getApState()==13)
-                    {
-                       /* try {
-                            HotSpot.enableWifi.invoke(HotSpot.wifiManager, null, false);
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
-                        } catch (InvocationTargetException e) {
-                            e.printStackTrace();
-                        }
-                        Toast.makeText(getApplicationContext(), "The App Adaptering it options...", Toast.LENGTH_LONG).show();
+            setContentView(R.layout.activity_hot_spot);
+            final TextView actionsNoteTv = findViewById(R.id.actions_note_tv);
+            actionsNoteTv.setMovementMethod(LinkMovementMethod.getInstance());
 
 
-                        try {
-                            Thread.sleep(10000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }*/
+        }
 
-                        Intent clientScreenActivity = new Intent(getApplicationContext(),DeviceConnected.class);
-                        clientScreenActivity.putExtra("SSID", string_ssid);
-                        clientScreenActivity.putExtra("password",string_password);
-                        ConfigHotSpot.this.startActivity(clientScreenActivity);
-                    }
-                   /* if(hotSpot.setHotSpot(string_ssid, string_password))
-                    {
+        else
+        {
+            setContentView(R.layout.activity_config_hot_spot);
+        }
 
-                        Intent clientScreenActivity = new Intent(getApplicationContext(),DeviceConnected.class);
-                        clientScreenActivity.putExtra("SSID", string_ssid);
-                        clientScreenActivity.putExtra("password",string_password);
-                        ConfigHotSpot.this.startActivity(clientScreenActivity);
-                    }*/
+        context = this;
 
-                }
-
-            }
-        });
     }
+
+    @Override
+    void onPermissionsOkay() {
+
+    }
+
+
+    public void onClickTurnOnAction(View v){
+        WifiManager wifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        int apState = 0;
+        try {
+            apState = (Integer) wifiManager.getClass().getMethod("getWifiApState").invoke(wifiManager);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        if(apState==13)
+        {
+            Intent intent = new Intent(getString(R.string.intent_action_turnoff));
+            sendImplicitBroadcast(this,intent);
+
+        }else{
+            Intent intent = new Intent(getString(R.string.intent_action_turnon));
+            sendImplicitBroadcast(this,intent);
+        }
+
+    }
+
+
+
+
+    private static void sendImplicitBroadcast(Context ctxt, Intent i) {
+        PackageManager pm=ctxt.getPackageManager();
+        List<ResolveInfo> matches=pm.queryBroadcastReceivers(i, 0);
+
+        for (ResolveInfo resolveInfo : matches) {
+            Intent explicit=new Intent(i);
+            ComponentName cn=
+                    new ComponentName(resolveInfo.activityInfo.applicationInfo.packageName,
+                            resolveInfo.activityInfo.name);
+
+            explicit.setComponent(cn);
+            ctxt.sendBroadcast(explicit);
+        }
+    }
+
+
 
 
 }

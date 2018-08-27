@@ -3,4 +3,26 @@
     <string name="title_activity_device_control_screen">Device Control Screen</string>
     <string name="title_config_hotSpot">HotSpot Configuration</string>
     <string name="title_activity_devices_connected">List of connected devices</string>
+
+    <string name="intent_action_turnon">com.barantech.noamb.appserver.services.TURN_ON</string>
+    <string name="intent_action_turnoff">com.barantech.noamb.appserver.services.TURN_OFF</string>
+    <string name="intent_action_ondestroy">com.barantech.noamb.appserver.services.ON_DESTROY</string>
+
+    <string name="intent_data_scheme">wifihotspot</string>
+    <string name="intent_data_host_turnon">turnon</string>
+    <string name="intent_data_host_turnoff">turnoff</string>
+    <string name="on_uri"><a href="wifihotspot://turnon">wifihotspot://turnon</a></string>
+    <string name="off_uri"><a href="wifihotspot://turnoff">wifihotspot://turnoff</a></string>
+
+    <string name="turnon_button">Turn On</string>
+    <string name="turnoff_button">Turn Off</string>
+    <string name="dummy_content">NOTE TO\nTHE UNINITIATED</string>
+
+    <string name="notification_chnnl">Hot Spot</string>
+    <string name="notification_chnnl_location_descr">Keeps wifi hot spot persistent</string>
+
+    <string name="needpermissions">com.barantech.noamb.appserver.services.NEED_PERMISSION</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="actions_note">Before you continue using this app check that the\nSSID is \"RBS1\" and the Password is \"12345678\"</string>
+    <string name="instructions">INSTRUCTIONS</string>
 </resources>

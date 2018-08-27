@@ -8,8 +8,12 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.WRITE_SETTINGS"
         tools:ignore="ProtectedPermissions"/>
+    <uses-permission android:name="android.permission.TETHER_PRIVILEGE" />
+    <permission android:name="android.permission.OVERRIDE_WIFI_CONFIG"
+        android:protectionLevel="signature|privileged" />
 
 
     <application
@@ -52,11 +56,35 @@
             android:screenOrientation="portrait"
 
             >
+        </activity>
 
+        <activity
+            android:name=".screen.MagicActivity"
+            android:theme="@style/Theme.Transparent">
+            <intent-filter>
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <data android:scheme="wifihotspot" />
+            </intent-filter>
         </activity>
 
         <service android:name=".services.ClosingService"
                  android:stopWithTask="true"/>
+
+        <service
+            android:name=".services.HotSpotIntentService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <receiver android:name=".services.HotSpotIntentReceiver" android:enabled="true" android:exported="true">
+            <intent-filter>
+                <action android:name="com.barantech.noamb.appserver.services.TURN_ON"/>
+                <action android:name="com.barantech.noamb.appserver.services.TURN_OFF"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
