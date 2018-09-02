@@ -1,9 +1,13 @@
 package com.barantech.noamb.appserver.screen;
 
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -21,10 +25,14 @@ import android.widget.TextView;
 
 import com.barantech.noamb.appserver.R;
 import com.barantech.noamb.appserver.services.CommunicationThread;
+import com.barantech.noamb.appserver.services.HotSpotIntentService;
 import com.barantech.noamb.appserver.services.Server;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 
 public class DeviceConnected extends AppCompatActivity {
@@ -33,7 +41,7 @@ public class DeviceConnected extends AppCompatActivity {
     private static Context context;
     private static RecyclerView mRecyclerView;
     private static ProgressBar mProgressBar;
-
+    private boolean pause;
 
     private Server server;
 
@@ -44,7 +52,7 @@ public class DeviceConnected extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
+        pause = false;
 
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
@@ -123,14 +131,14 @@ public class DeviceConnected extends AppCompatActivity {
 
 
             @Override
-            public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
                 View itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.device_list_row, parent, false);
                 return new MyViewHolder(itemView);
             }
 
             @Override
-            public void onBindViewHolder(MyViewHolder holder, int position) {
+            public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
                 if(holder.IsBinded) return;
                 holder.IsBinded = true;
                 final CommunicationThread device = (new ArrayList<CommunicationThread>(mDeviceList.values())).get(position);
@@ -207,20 +215,52 @@ public class DeviceConnected extends AppCompatActivity {
    protected void onDestroy()
    {
        super.onDestroy();
-      // Intent hotspot = new Intent(getApplicationContext(),HotSpotIntentService.class);
-      // hotspot.setAction(getString(R.string.intent_action_ondestroy));
-      // this.startActivity(hotspot);
-       Server.onDestroy();
-       //finish();
-       Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-       intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-       intent.putExtra("EXIT", true);
-       this.startActivity(intent);
+
+       turnOffHotSpot();
+       try {
+
+           Thread.sleep(20000);
+
+       } catch (Exception e) {
+           e.printStackTrace();
+       }
+        Server.onDestroy();
    }
 
+    @Override
    protected void onResume()
    {
        super.onResume();
        loadDevice();
    }
+
+
+
+
+
+   private void turnOffHotSpot()
+   {
+       if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.O)
+       {
+           HotSpotIntentService.mMyWifiManager.stopTethering();
+
+       }else{
+           WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+           Method[] methods = wifiManager.getClass().getDeclaredMethods();
+           for (Method method : methods)
+           {
+               if (method.getName().equals("setWifiApEnabled"))
+               {
+                   try {
+                       method.invoke(wifiManager, null, false);
+                   } catch (IllegalAccessException e) {
+                       e.printStackTrace();
+                   } catch (InvocationTargetException e) {
+                       e.printStackTrace();
+                   }
+               }
+           }
+       }
+   }
+
 }

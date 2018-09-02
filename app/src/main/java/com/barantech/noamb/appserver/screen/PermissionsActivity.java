@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.Toolbar;
 
 public abstract class PermissionsActivity extends Activity {
     static final int MY_PERMISSIONS_MANAGE_WRITE_SETTINGS = 100 ;
@@ -100,6 +101,7 @@ public abstract class PermissionsActivity extends Activity {
 
     }
 
-
     abstract void onPermissionsOkay();
+
+
 }

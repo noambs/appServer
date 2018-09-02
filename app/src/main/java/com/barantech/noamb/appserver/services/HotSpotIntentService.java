@@ -38,7 +38,7 @@ public class HotSpotIntentService extends IntentService {
     private Intent mStartIntent;
     private static Context mContext;
     @RequiresApi(api = Build.VERSION_CODES.O)
-    MyWifiManager mMyWifiManager;
+   public static MyWifiManager mMyWifiManager;
 
 
     /**
@@ -109,7 +109,7 @@ public class HotSpotIntentService extends IntentService {
                         progressDialog.execute();
                         try {
 
-                                Thread.sleep(20000);
+                                Thread.sleep(10000);
 
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -148,10 +148,13 @@ public class HotSpotIntentService extends IntentService {
             }
         }
 
+        if(!destroy)
+        {
+            Intent clientScreenActivity = new Intent(mContext,DeviceConnected.class);
 
-        Intent clientScreenActivity = new Intent(mContext,DeviceConnected.class);
+            mContext.startActivity(clientScreenActivity);
+        }
 
-        mContext.startActivity(clientScreenActivity);
     }
 
     private boolean turnOnHotspot(boolean turnOn)
@@ -193,7 +196,7 @@ public class HotSpotIntentService extends IntentService {
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private void hotspot(boolean turnOn){
+    public void hotspot(boolean turnOn){
 
         if (mMyWifiManager ==null){
             mMyWifiManager = new MyWifiManager(this);
