@@ -30,6 +30,14 @@
                 android:theme="@style/AppTheme.Toolbar"
                 app:popupTheme="@style/AppTheme.PopupOverlay">
 
+
+                <ImageButton
+                    android:id="@+id/switchHotSpot"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/hot_spot_on"
+                    android:layout_gravity="right"
+                    />
             </android.support.v7.widget.Toolbar>
 
         </android.support.design.widget.AppBarLayout>
