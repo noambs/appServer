@@ -18,7 +18,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ever_switch_logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
@@ -71,18 +71,20 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".services.ClosingService"
-                 android:stopWithTask="true"/>
+
 
         <service
             android:name=".services.HotSpotIntentService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="true"
+            />
 
         <receiver android:name=".services.HotSpotIntentReceiver" android:enabled="true" android:exported="true">
             <intent-filter>
+                <action android:name="com.barantech.noamb.appserver.services.ON_DESTROY"/>
                 <action android:name="com.barantech.noamb.appserver.services.TURN_ON"/>
                 <action android:name="com.barantech.noamb.appserver.services.TURN_OFF"/>
+
             </intent-filter>
         </receiver>
     </application>

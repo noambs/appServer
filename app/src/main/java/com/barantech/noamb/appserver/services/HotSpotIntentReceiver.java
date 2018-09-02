@@ -16,7 +16,7 @@ public class HotSpotIntentReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         final String ACTION_TURNON = context.getString(R.string.intent_action_turnon);
         final String ACTION_TURNOFF = context.getString(R.string.intent_action_turnoff);
-
+        final String ACTION_ONDESTROY = context.getString(R.string.intent_action_ondestroy);
         Log.i(TAG,"Received intent");
         if (intent != null) {
             final String action = intent.getAction();
@@ -25,6 +25,8 @@ public class HotSpotIntentReceiver extends BroadcastReceiver {
                 MagicActivity.useMagicActivityToTurnOn(context);
             } else if (ACTION_TURNOFF.equals(action)) {
                 MagicActivity.useMagicActivityToTurnOff(context);
+            } else if(ACTION_ONDESTROY.equals(action)){
+                MagicActivity.useMagicActivityToDestroy(context);
             }
         }
 

@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.barantech.noamb.appserver.R;
@@ -38,6 +39,10 @@ public class ConfigHotSpot extends PermissionsActivity {
         else
         {
             setContentView(R.layout.activity_config_hot_spot);
+            EditText ssid = (EditText)findViewById(R.id.SSID);
+            ssid.setText("RBS1");
+            EditText pass = (EditText)findViewById(R.id.password);
+            pass.setText("12345678");
         }
 
         context = this;

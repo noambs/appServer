@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">appServer</string>
+    <string name="app_name">SwitchServer</string>
     <string name="title_activity_device_control_screen">Device Control Screen</string>
     <string name="title_config_hotSpot">HotSpot Configuration</string>
     <string name="title_activity_devices_connected">List of connected devices</string>
@@ -23,6 +23,6 @@
 
     <string name="needpermissions">com.barantech.noamb.appserver.services.NEED_PERMISSION</string>
     <string name="title_activity_main2">Main2Activity</string>
-    <string name="actions_note">Before you continue using this app check that the\nSSID is \"RBS1\" and the Password is \"12345678\"</string>
+    <string name="actions_note">Before you continue using this app check that\nthe SSID is \"RBS1\" and the Password is \"12345678\"</string>
     <string name="instructions">INSTRUCTIONS</string>
 </resources>

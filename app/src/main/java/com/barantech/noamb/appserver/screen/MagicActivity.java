@@ -27,6 +27,12 @@ public class MagicActivity extends PermissionsActivity{
         c.startActivity(i);
     }
 
+    public static void useMagicActivityToDestroy(Context c){
+        Intent i = new Intent(c.getString(R.string.intent_action_ondestroy));
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        c.startActivity(i);
+    }
+
     private static final String TAG = MagicActivity.class.getSimpleName();
 
     @Override
