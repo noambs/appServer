@@ -4,6 +4,7 @@ package com.barantech.noamb.appserver.screen;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,6 +28,7 @@ import android.widget.TextView;
 import com.barantech.noamb.appserver.R;
 import com.barantech.noamb.appserver.services.CommunicationThread;
 import com.barantech.noamb.appserver.services.HotSpotIntentService;
+import com.barantech.noamb.appserver.services.MyOnStartTetheringCallback;
 import com.barantech.noamb.appserver.services.Server;
 
 import java.lang.reflect.InvocationTargetException;
@@ -42,7 +45,7 @@ public class DeviceConnected extends AppCompatActivity {
     private static RecyclerView mRecyclerView;
     private static ProgressBar mProgressBar;
     private boolean pause;
-
+    private ImageButton hotSpotButton;
     private Server server;
 
     @Override
@@ -53,7 +56,8 @@ public class DeviceConnected extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         pause = false;
-
+        hotSpotButton = (ImageButton) findViewById(R.id.switchHotSpot);
+        hotSpotButton.setTag(R.drawable.hot_spot_on);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
         mRecyclerView = (RecyclerView) findViewById(R.id.device_list);
@@ -72,6 +76,28 @@ public class DeviceConnected extends AppCompatActivity {
         context = DeviceConnected.this;
         loadDevice();
 
+        hotSpotButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int tag = (int) hotSpotButton.getTag();
+                if(tag == R.drawable.hot_spot_on)
+                {
+
+                    hotSpotButton.setBackgroundResource(R.drawable.hot_spot_off);
+                    hotSpotButton.setTag(R.drawable.hot_spot_off);
+
+                    turnOffHotSpot();
+                    deviceList.clear();
+                    loadDevice();
+                }else{
+
+                    hotSpotButton.setBackgroundResource(R.drawable.hot_spot_on);
+                    hotSpotButton.setTag(R.drawable.hot_spot_on);
+
+                    turnOnHotSpot();
+                }
+            }
+        });
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -237,9 +263,54 @@ public class DeviceConnected extends AppCompatActivity {
 
 
 
+    private void turnOnHotSpot()
+    {
+        if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.O)
+        {
+            MyOnStartTetheringCallback callback = new MyOnStartTetheringCallback() {
+                @Override
+                public void onTetheringStarted() {
 
-   private void turnOffHotSpot()
-   {
+                }
+
+                @Override
+                public void onTetheringFailed() {
+
+                }
+            };
+
+            HotSpotIntentService.mMyWifiManager.startTethering(callback, null);
+
+        }else{
+            WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            Method[] methods = wifiManager.getClass().getDeclaredMethods();
+            for (Method method : methods) {
+                if (method.getName().equals("setWifiApEnabled")) {
+                    WifiConfiguration myConfig = new WifiConfiguration();
+                    myConfig.SSID = "RBS1";
+                    myConfig.preSharedKey = "12345678";
+                    myConfig.status = WifiConfiguration.Status.ENABLED;
+                    myConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
+                    myConfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+                    myConfig.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+                    myConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+                    myConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
+                    myConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
+                    myConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
+                    wifiManager.setWifiEnabled(false); //Turning off wifi because tethering requires wifi to be off
+                    try {
+                        method.invoke(wifiManager, myConfig, true); //Activating tethering
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+    private void turnOffHotSpot()
+    {
        if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.O)
        {
            HotSpotIntentService.mMyWifiManager.stopTethering();
@@ -261,6 +332,6 @@ public class DeviceConnected extends AppCompatActivity {
                }
            }
        }
-   }
+    }
 
 }
